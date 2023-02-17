@@ -1,0 +1,139 @@
+﻿@page "/device"
+@model KKT_STATUS_WEB.Pages.DeviceModel
+@{
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ККТ</th>
+                    <th>Статус</th>
+                    <th>Фаза ФН</th>
+                    <th>Номер ФН</th>
+                    <th>Версия ПО</th>
+                    <th>Дата последнего документа</th>
+                    <th>Сообщений в очереди</th>
+                    <th>Остаток ресурсов</th>
+                    <th>Процент заполнения</th>
+                </tr>
+            </thead>
+            @{
+
+                foreach (var device in @Model.devlist)
+                {
+                    <tbody>
+                        <tr>
+                            <th><center><div>@device.DeviceId</div></center></th>
+                            <th>
+                                @{
+                                    if (@device.ResidualProcent > 98 && @device.LastDocumentDateTimeSpan > 120)
+                                    {
+                                        <center><div type="" class="btn btn-danger btn-circle btn-sm" title="Критический уровень фискального накопителя&#013;Документы на фискализацию отсутствовали более 2 часов&#013;"></div></center>
+                                    }
+                                    else if (@device.ResidualProcent > 98)
+                                    {
+                                        <center><div type="" class="btn btn-danger btn-circle btn-sm" title="Критический уровень фискального накопителя&#013;"></div></center>
+                                    }
+                                    else if (@device.ResidualProcent <= 98 && @device.ResidualProcent >= 95)
+                                    {
+                                        <center><div type="" class="btn btn-warning btn-circle btn-sm" title="Фискальный накопитель почти полон"></div></center>
+                                    }
+                                    else if (@device.ResidualProcent <= 98 && @device.ResidualProcent >= 95 && @device.LastDocumentDateTimeSpan > 120)
+                                    {
+                                        <center><div type="" class="btn btn-warning btn-circle btn-sm" title="Фискальный накопитель почти полон&#013;Документы на фискализацию отсутствовали более 2 часов&#013;"></div></center>
+                                    }
+                                    else if (@device.LastDocumentDateTimeSpan > 120)
+                                    {
+                                        <center><div type="" class="btn btn-warning btn-circle btn-sm" title="Документы на фискализацию отсутствовали более 2 часов&#013;"></div></center>
+                                    }
+                                    else if (@device.ResidualProcent == 0 && @device.LastDocumentNumber == 0)
+                                    {
+                                        <center><div type="" class="btn btn-danger btn-circle btn-sm" title="Требуется внимание&#013;Устройство работает некорректно&#013;"></div></center>
+                                    }
+                                    else
+                                    {
+                                        <center><div type="" class="btn btn-success btn-circle btn-sm" title="Устройство исправно"></div></center>
+                                    }
+                                }
+                            </th>
+                            <th>
+                                @{
+                                    if (@device.LifePhase == 0)
+                                    {
+                                        <div>Настройка</div>
+                                    }
+                                    else if (@device.LifePhase == 1)
+                                    {
+                                        <div>Готов</div>
+                                    }
+                                    else if (@device.LifePhase == 3)
+                                    {
+                                        <div>Фискализация</div>
+                                    }
+                                    else if (@device.LifePhase == 7)
+                                    {
+                                        <div>Постфискальный</div>
+                                    }
+                                    else if (@device.LifePhase == 15)
+                                    {
+                                        <div>ФН закрыт</div>
+                                    }
+                                    else if (@device.LifePhase == 99)
+                                    {
+                                        <div>Ошибка ФН</div>
+                                    }
+                                    else if (@device.LifePhase == 100)
+                                    {
+                                        <div>-</div>
+                                    }
+                                }
+                            </th>
+                            <th>@device.FiscalStoreNumber</th>
+                            <th>@device.SoftwareVersion</th>
+                            <th>
+                                @{
+                                    if (@device.LastDocumentDate == Convert.ToDateTime("01.01.2000"))
+                                    {
+                                        <div>-</div>
+                                    }
+                                    else
+                                    {
+                                        <div>@device.LastDocumentDate</div>
+                                    }
+                                }
+                            </th>
+                            <th> <div title="Внимание!&#013;Актуальность данных не гарантируется!&#013;">@device.MessagesPendingToSend</div></th>
+
+
+
+                            <th><div title="Номер последнего документа: @device.SpentResource">@device.ResidualResource</div></th>
+                            <th>
+                                @{
+                                    if (@device.ResidualProcent < 95)
+                                    {
+                                        <div class="progress" title="@device.ResidualProcent%">
+                                            <div class="progress-bar" role="progressbar" style="width: @device.ResidualProcent%;" aria-valuenow="@device.ResidualProcent" aria-valuemin="0" aria-valuemax="100" title="@device.ResidualProcent%"><span>@device.ResidualProcent%</span></div>
+                                        </div>
+                                    }
+                                    else if (@device.ResidualProcent <= 98 && @device.ResidualProcent >= 95)
+                                    {
+                                        <div class="progress" title="@device.ResidualProcent%">
+                                            <div class="progress-bar bg-warning" role="progressbar" style="width: @device.ResidualProcent%;" aria-valuenow="@device.ResidualProcent" aria-valuemin="0" aria-valuemax="100" title="@device.ResidualProcent%"><span>@device.ResidualProcent%</span></div>
+                                        </div>
+                                    }
+                                    else if (@device.ResidualProcent > 98)
+                                    {
+                                        <div class="progress" title="@device.ResidualProcent%">
+                                            <div class="progress-bar bg-danger" role="progressbar" style="width: @device.ResidualProcent%;" aria-valuenow="@device.ResidualProcent" aria-valuemin="0" aria-valuemax="100" title="@device.ResidualProcent%"><span>@device.ResidualProcent%</span></div>
+                                        </div>
+                                    }
+                                }
+                            </th>
+                        </tr>
+                    </tbody>
+
+                }
+
+            }
+        </table>
+    }
+
+
